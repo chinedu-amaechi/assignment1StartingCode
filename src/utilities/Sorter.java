@@ -78,7 +78,8 @@ public class Sorter {
     }
 
     // Merge Sort
-    public static void mergeSort(Shape[] shapes, Comparator<Shape> comparator) {
+    public static void mergeSort(Shape[] shapes, Comparator<Shape> comparator)
+    {
         if (shapes.length > 1) {
             Shape[] left = new Shape[shapes.length / 2];
             Shape[] right = new Shape[shapes.length - shapes.length / 2];
@@ -92,7 +93,8 @@ public class Sorter {
         }
     }
 
-    private static void merge(Shape[] shapes, Shape[] left, Shape[] right, Comparator<Shape> comparator) {
+    private static void merge(Shape[] shapes, Shape[] left, Shape[] right, Comparator<Shape> comparator)
+    {
         int i = 0, j = 0, k = 0;
         while (i < left.length && j < right.length) {
             if (comparator.compare(left[i], right[j]) <= 0) {
