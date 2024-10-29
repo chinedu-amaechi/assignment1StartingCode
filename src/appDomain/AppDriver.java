@@ -12,32 +12,53 @@ public class AppDriver {
         String fileName = null;
         String compareType = null;
         String sortTypeAlgorithm = null;
+        
+        String[] myArgs = new String[3];
 
+        String fileInput;
+        String compareInput;
+        String sortInput;
+        do {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the file name:");
+            fileInput = scanner.nextLine();
+
+            System.out.println("Enter the compare type:");
+            compareInput = scanner.nextLine();
+
+            System.out.println("Enter the sort type:");
+            sortInput = scanner.nextLine();
+        } while (fileInput.isBlank() || compareInput.isBlank() || sortInput.isBlank());
+        myArgs[0] = "-f" + fileInput.toLowerCase();
+        myArgs[1] = "-t" + compareInput.toLowerCase();
+        myArgs[2] = "-s" + sortInput.toLowerCase();
+
+        
         // Parse the command-line arguments
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].length() < 2) {
-                System.out.println("Unknown argument: " + args[i]);
+        for (int i = 0; i < myArgs.length; i++) {
+            if (myArgs[i].length() < 2) {
+                System.out.println("Unknown argument: " + myArgs[i]);
                 return;
             }
 
-            String arg = args[i].toLowerCase();
+            String arg = myArgs[i].toLowerCase();
             switch (arg.charAt(1)) {
                 case 'f':
-                    if (args[i].length() > 2) {
-                        fileName = args[i].substring(2);
-                    } else if (i + 1 < args.length) {
-                        fileName = args[i + 1];
+                    if (myArgs[i].length() > 2) {
+                        fileName = myArgs[i].substring(2);
+                    } else if (i + 1 < myArgs.length) {
+                        fileName = myArgs[i + 1];
                         i++;
                     }
                     break;
                 case 't':
-                    compareType = args[i].substring(2).toLowerCase();
+                    compareType = myArgs[i].substring(2).toLowerCase();
                     break;
                 case 's':
-                    sortTypeAlgorithm = args[i].substring(2).toLowerCase();
+                    sortTypeAlgorithm = myArgs[i].substring(2).toLowerCase();
                     break;
                 default:
-                    System.out.println("Unknown argument: " + args[i]);
+                    System.out.println("Unknown argument: " + myArgs[i]);
                     return;
             }
         }
