@@ -3,6 +3,7 @@ package appDomain;
 import shapes.*;
 import utilities.*;
 import java.util.*;
+import java.io.File;
 import java.io.IOException;
 
 public class AppDriver {
@@ -19,28 +20,29 @@ public class AppDriver {
                 return;
             }
 
-            // Convert the entire argument to lowercase for case-insensitive handling
             String arg = args[i].toLowerCase();
-
             switch (arg.charAt(1)) {
-                case 'f': 
-                    // Handle file name with or without spaces after the '-f' flag
+                case 'f':
                     if (args[i].length() > 2) {
-                        fileName = args[i].substring(2); // e.g., -fshapes1.txt
+                        fileName = args[i].substring(2);
                     } else if (i + 1 < args.length) {
-                        fileName = args[i + 1]; // e.g., -f shapes1.txt
-                        i++; // Skip the next argument since it's the file name
+                        fileName = args[i + 1];
+                        i++;
                     }
                     break;
-                case 't': compareType = args[i].substring(2).toLowerCase(); break; // Sorting type
-                case 's': sortTypeAlgorithm = args[i].substring(2).toLowerCase(); break; // Sorting algorithm
-                default: 
-                    System.out.println("Unknown argument: " + args[i]); 
+                case 't':
+                    compareType = args[i].substring(2).toLowerCase();
+                    break;
+                case 's':
+                    sortTypeAlgorithm = args[i].substring(2).toLowerCase();
+                    break;
+                default:
+                    System.out.println("Unknown argument: " + args[i]);
                     return;
             }
         }
 
-        // Validate that the required arguments are provided
+        // Validate that required arguments are provided
         if (fileName == null || compareType == null || sortTypeAlgorithm == null) {
             System.out.println("Invalid input! You must provide the following:");
             System.out.println("- File with -f (e.g., -fshapes1.txt or -f shapes1.txt)");
@@ -49,7 +51,19 @@ public class AppDriver {
             return;
         }
 
-        // Attempt to read the file and sort the shapes
+        // Print the absolute file path
+        try {
+            File file = new File(fileName);
+            System.out.println("Absolute path of file: " + file.getAbsolutePath());
+        } catch (Exception e) {
+            System.out.println("Error resolving file path: " + e.getMessage());
+            return;
+        }
+
+        // Print sorting information based on arguments
+        printSortingInfo(compareType, sortTypeAlgorithm);
+
+        // Attempt to read file and sort shapes
         try {
             Shape[] shapes = FileReader.readShapesFromFile(fileName);
             if (shapes.length == 0) {
@@ -89,7 +103,8 @@ public class AppDriver {
             }
             long endTime = System.currentTimeMillis();
 
-            printResults(shapes);
+            printResults(shapes, compareType);
+            System.out.println(); // Blank Space
             System.out.println("Run time was: " + (endTime - startTime) + " milliseconds");
 
         } catch (IOException e) {
@@ -99,32 +114,86 @@ public class AppDriver {
         }
     }
 
+    // Method to print sorting information based on the given arguments
+    private static void printSortingInfo(String compareType, String sortTypeAlgorithm) {
+        String compareMethod;
+        switch (compareType) {
+            case "v":
+                compareMethod = "Volume";
+                break;
+            case "a":
+                compareMethod = "Base Area";
+                break;
+            case "h":
+                compareMethod = "Height";
+                break;
+            default:
+                compareMethod = "Unknown";
+                break;
+        }
+
+        String sortingMethod;
+        switch (sortTypeAlgorithm) {
+            case "b":
+                sortingMethod = "Bubble Sort";
+                break;
+            case "i":
+                sortingMethod = "Insertion Sort";
+                break;
+            case "q":
+                sortingMethod = "Quick Sort";
+                break;
+            case "m":
+                sortingMethod = "Merge Sort";
+                break;
+            case "s":
+                sortingMethod = "Selection Sort";
+                break;
+            case "h":
+                sortingMethod = "Heap Sort";
+                break;
+            default:
+                sortingMethod = "Unknown";
+                break;
+        }
+
+        System.out.println("Compare method: " + compareMethod);
+        System.out.println("Sorting method: " + sortingMethod);
+        System.out.println(); // Blank Space
+    }
+
     // Method to get the appropriate comparator based on compare type
     private static Comparator<Shape> getComparator(String compareType) {
         switch (compareType) {
-            case "v": return new VolumeComparator(); // Sort by volume (Descending order)
-            case "a": return new BaseAreaComparator(); // Sort by base area (Descending order)
-            case "h": return Comparator.comparingDouble(Shape::getHeight).reversed(); // Sort by height
-            default: return null; // Default to null for invalid compare type
+            case "v":
+                return new VolumeComparator(); // Sort by volume (Descending order)
+            case "a":
+                return new BaseAreaComparator(); // Sort by base area (Descending order)
+            case "h":
+                return new Comparator<Shape>() {
+                    @Override
+                    public int compare(Shape shape1, Shape shape2) {
+                        return Double.compare(shape2.getHeight(), shape1.getHeight()); // Sort by height
+                    }
+                };
+            default:
+                return null; // Default to null for invalid compare type
         }
     }
 
     // Method to print the sorted shapes: first, every 1000th, and last shape
-    private static void printResults(Shape[] shapes) {
+    private static void printResults(Shape[] shapes, String compareType) {
         if (shapes.length == 0) {
             System.out.println("No shapes to print.");
             return;
         }
 
-        // Print first element
-        System.out.println("First element is: " + shapes[0]);
+        System.out.println("First element is: " + shapes[0].formatShape(compareType));
 
-        // Print every 1000th element
         for (int i = 999; i < shapes.length; i += 1000) {
-            System.out.println((i + 1) + "-th element is: " + shapes[i]);
+            System.out.println((i + 1) + "-th element is: " + shapes[i].formatShape(compareType));
         }
 
-        // Print last element
-        System.out.println("Last element is: " + shapes[shapes.length - 1]);
+        System.out.println("Last element is: " + shapes[shapes.length - 1].formatShape(compareType));
     }
 }
